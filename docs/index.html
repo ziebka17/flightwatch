@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FlightWatch – okazje z Gdańska</title>
+<style>
+:root{color-scheme:light;--page:#f9f9f7;--surface:#fcfcfb;--ink:#0b0b0b;--ink2:#52514e;--muted:#898781;
+--grid:#e1e0d9;--axis:#c3c2b7;--border:rgba(11,11,11,.10);--s1:#2a78d6;--good:#006300;--crit:#d03b3b;--good-bg:#e7f5e7}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){color-scheme:dark;--page:#0d0d0d;--surface:#1a1a19;--ink:#fff;--ink2:#c3c2b7;
+--muted:#898781;--grid:#2c2c2a;--axis:#383835;--border:rgba(255,255,255,.10);--s1:#3987e5;--good:#0ca30c;--crit:#e66767;--good-bg:#10321a}}
+:root[data-theme=dark]{color-scheme:dark;--page:#0d0d0d;--surface:#1a1a19;--ink:#fff;--ink2:#c3c2b7;
+--muted:#898781;--grid:#2c2c2a;--axis:#383835;--border:rgba(255,255,255,.10);--s1:#3987e5;--good:#0ca30c;--crit:#e66767;--good-bg:#10321a}
+*{box-sizing:border-box}body{margin:0;background:var(--page);color:var(--ink);font:15px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif}
+.wrap{max-width:1100px;margin:0 auto;padding:24px 16px 48px}
+h1{font-size:24px;margin:0 0 4px}.sub{color:var(--ink2);margin:0 0 20px;font-size:14px}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:24px}
+.tile{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px}
+.tile .l{color:var(--ink2);font-size:13px}.tile .v{font-size:26px;font-weight:600;margin-top:2px}.tile .d{color:var(--muted);font-size:13px}
+.tabs{display:flex;gap:8px;margin:0 0 12px;flex-wrap:wrap}
+.tabs button{background:var(--surface);border:1px solid var(--border);color:var(--ink2);border-radius:999px;padding:6px 14px;font:inherit;cursor:pointer}
+.tabs button[aria-pressed=true]{color:var(--ink);border-color:var(--ink);font-weight:600}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:24px}
+table{width:100%;border-collapse:collapse}th{font-size:12px;color:var(--muted);font-weight:500;text-align:left;padding:10px 12px;border-bottom:1px solid var(--grid)}
+td{padding:10px 12px;border-bottom:1px solid var(--grid);vertical-align:middle;font-variant-numeric:tabular-nums}
+tr:last-child td{border-bottom:0}tr.route{cursor:pointer}tr.route:hover td{background:color-mix(in srgb,var(--ink) 4%,transparent)}
+.price{font-weight:600;white-space:nowrap}.deal .price{color:var(--good)}
+.badge{display:inline-block;font-size:12px;padding:1px 8px;border-radius:999px;background:var(--good-bg);color:var(--good);margin-left:6px;font-weight:600}
+.dim{color:var(--muted);font-size:13px}.path{font-size:13px;color:var(--ink2)}
+svg.spark{display:block;overflow:visible}
+tr.detail td{background:color-mix(in srgb,var(--ink) 3%,transparent);padding:8px 12px 12px}
+.detail ul{margin:0;padding-left:18px}.detail li{margin:2px 0;font-size:14px}
+a{color:var(--s1)}.tip{position:fixed;pointer-events:none;background:var(--surface);border:1px solid var(--border);border-radius:8px;
+padding:6px 10px;font-size:13px;box-shadow:0 4px 16px rgba(0,0,0,.15);display:none;z-index:9}
+.foot{color:var(--muted);font-size:13px}
+.scroll{overflow-x:auto}
+@media (max-width:700px){.hide-m{display:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>✈️ FlightWatch – okazje z Gdańska</h1>
+<p class="sub" id="sub"></p>
+<div class="tiles" id="tiles"></div>
+<div class="tabs" id="tabs" role="group" aria-label="Region"></div>
+<div class="card scroll"><table id="routes"><thead><tr>
+<th>Kierunek</th><th>Najtaniej teraz</th><th class="hide-m">Daty</th><th class="hide-m">Połączenie</th><th>Trend (45 dni)</th><th class="hide-m">Zwykle</th>
+</tr></thead><tbody></tbody></table></div>
+<h2 style="font-size:18px;margin:0 0 10px">Ostatnie alerty</h2>
+<div class="card scroll"><table id="alerts"><thead><tr><th>Kiedy</th><th>Trasa</th><th>Daty</th><th>Cena</th><th class="hide-m">Powód</th></tr></thead><tbody></tbody></table></div>
+<p class="foot">Ceny pochodzą z wyszukiwarki Aviasales (Travelpayouts Data API) i mogą być nieaktualne – zawsze sprawdź cenę przed zakupem.
+Kliknij trasę, żeby zobaczyć 5 najtańszych ofert. Ta strona jest generowana automatycznie po każdym skanowaniu.</p>
+</div>
+<div class="tip" id="tip"></div>
+<script id="data" type="application/json">{"origin": "GDN", "currency": "PLN", "generated": "2026-08-21T22:58:19.353852+00:00", "last_scan": "2026-08-21T22:58:17.445482+00:00", "routes": [{"code": "NYC", "name": "Nowy Jork", "region": "americas", "threshold": 1200.0, "best": {"price": 2413.0, "currency": "PLN", "depart": "2026-10-01", "ret": "2026-10-08", "out": "GDN → HAM → CDG → JFK (W6)", "back": "JFK → AMS → HAM → GDN (W6)", "stops": 2, "airlines": "W6,Gotogate", "seen": "2026-08-21T22:58:06.793914+00:00"}, "top": [{"price": 2413.0, "depart": "2026-10-01", "ret": "2026-10-08", "out": "GDN → HAM → CDG → JFK (W6)", "stops": 2}, {"price": 2538.0, "depart": "2026-10-02", "ret": "2026-10-09", "out": "GDN → CPH → EWR (SK)", "stops": 1}], "history": [{"t": "2026-08-21T22:36:37.646406+00:00", "p": 2328.0}, {"t": "2026-08-21T22:36:38.001988+00:00", "p": 2413.0}, {"t": "2026-08-21T22:58:06.512081+00:00", "p": 2328.0}, {"t": "2026-08-21T22:58:06.793914+00:00", "p": 2413.0}], "median": 2413.0, "min": 2328.0}, {"code": "LAX", "name": "Los Angeles", "region": "americas", "threshold": 1200.0, "best": {"price": 2783.0, "currency": "PLN", "depart": "2026-10-22", "ret": "2026-11-03", "out": "GDN → HEL → LAX (AY)", "back": "LAX → DFW → HEL → GDN (AY)", "stops": 1, "airlines": "AY,Finnair", "seen": "2026-08-21T22:58:07.427036+00:00"}, "top": [{"price": 2783.0, "depart": "2026-10-22", "ret": "2026-11-03", "out": "GDN → HEL → LAX (AY)", "stops": 1}], "history": [{"t": "2026-08-21T22:36:38.865267+00:00", "p": 2783.0}, {"t": "2026-08-21T22:58:07.427036+00:00", "p": 2783.0}], "median": 2783.0, "min": 2783.0}, {"code": "MIA", "name": "Miami", "region": "americas", "threshold": 1200.0, "best": null, "top": [], "history": [], "median": null, "min": null}, {"code": "CHI", "name": "Chicago", "region": "americas", "threshold": 1200.0, "best": null, "top": [], "history": [], "median": null, "min": null}, {"code": "YTO", "name": "Toronto", "region": "americas", "threshold": 1200.0, "best": null, "top": [], "history": [], "median": null, "min": null}, {"code": "MEX", "name": "Meksyk", "region": "americas", "threshold": 1200.0, "best": {"price": 3951.0, "currency": "PLN", "depart": "2026-09-07", "ret": "2026-09-13", "out": "GDN → WAW → BCN → CUN → TLC (LO)", "back": "TLC → CUN → MAN → GDN (LO)", "stops": 3, "airlines": "LO,Flightnetwork", "seen": "2026-08-21T22:58:08.981751+00:00"}, "top": [{"price": 3951.0, "depart": "2026-09-07", "ret": "2026-09-13", "out": "GDN → WAW → BCN → CUN → TLC (LO)", "stops": 3}], "history": [{"t": "2026-08-21T22:36:41.065986+00:00", "p": 3951.0}, {"t": "2026-08-21T22:58:08.981751+00:00", "p": 3951.0}], "median": 3951.0, "min": 3951.0}, {"code": "CUN", "name": "Cancún", "region": "americas", "threshold": 1200.0, "best": {"price": 3488.0, "currency": "PLN", "depart": "2026-11-05", "ret": "2026-11-21", "out": "GDN → KEF → ORD → MEX → CUN (FI)", "back": "CUN → GDN (FI, 3 przes.)", "stops": 3, "airlines": "FI,Kiwi.com", "seen": "2026-08-21T22:58:09.791535+00:00"}, "top": [{"price": 3488.0, "depart": "2026-11-05", "ret": "2026-11-21", "out": "GDN → KEF → ORD → MEX → CUN (FI)", "stops": 3}], "history": [{"t": "2026-08-21T22:36:41.775602+00:00", "p": 3232.0}, {"t": "2026-08-21T22:36:42.130394+00:00", "p": 3488.0}, {"t": "2026-08-21T22:58:09.487395+00:00", "p": 3232.0}, {"t": "2026-08-21T22:58:09.791535+00:00", "p": 3488.0}], "median": 3488.0, "min": 3232.0}, {"code": "SAO", "name": "São Paulo", "region": "americas", "threshold": 1200.0, "best": null, "top": [], "history": [], "median": null, "min": null}, {"code": "BUE", "name": "Buenos Aires", "region": "americas", "threshold": 1200.0, "best": {"price": 4883.0, "currency": "PLN", "depart": "2026-11-03", "ret": "2026-11-10", "out": "GDN → MAD → PUJ → EZE (W6)", "back": "EZE → GDN (W6, 3 przes.)", "stops": 2, "airlines": "W6,Kupi.com", "seen": "2026-08-21T22:58:10.987134+00:00"}, "top": [{"price": 4883.0, "depart": "2026-11-03", "ret": "2026-11-10", "out": "GDN → MAD → PUJ → EZE (W6)", "stops": 2}, {"price": 5043.0, "depart": "2026-11-03", "ret": "2026-11-17", "out": "GDN → AEP (W6, 3 przes.)", "stops": 3}], "history": [{"t": "2026-08-21T22:36:43.097906+00:00", "p": 4265.0}, {"t": "2026-08-21T22:36:43.424848+00:00", "p": 4883.0}, {"t": "2026-08-21T22:58:10.674622+00:00", "p": 4265.0}, {"t": "2026-08-21T22:58:10.987134+00:00", "p": 4883.0}], "median": 4883.0, "min": 4265.0}, {"code": "LIM", "name": "Lima", "region": "americas", "threshold": 1200.0, "best": null, "top": [], "history": [], "median": null, "min": null}, {"code": "BOG", "name": "Bogota", "region": "americas", "threshold": 1200.0, "best": null, "top": [], "history": [], "median": null, "min": null}, {"code": "TYO", "name": "Tokio", "region": "asia", "threshold": 1000.0, "best": {"price": 3655.0, "currency": "PLN", "depart": "2026-10-13", "ret": "2026-10-22", "out": "GDN → BCN → BRU → PEK → HND (W6)", "back": "HND → GDN (W6, 2 przes.)", "stops": 3, "airlines": "W6,Aviakassa", "seen": "2026-08-21T22:58:12.893059+00:00"}, "top": [{"price": 3655.0, "depart": "2026-10-13", "ret": "2026-10-22", "out": "GDN → BCN → BRU → PEK → HND (W6)", "stops": 3}, {"price": 4257.0, "depart": "2026-10-24", "ret": "2026-11-06", "out": "GDN → WAW → CPH → SGN → NRT (LO)", "stops": 3}], "history": [{"t": "2026-08-21T22:36:44.646674+00:00", "p": 3953.0}, {"t": "2026-08-21T22:36:44.919062+00:00", "p": 3650.0}, {"t": "2026-08-21T22:36:45.191922+00:00", "p": 3655.0}, {"t": "2026-08-21T22:58:12.135634+00:00", "p": 3953.0}, {"t": "2026-08-21T22:58:12.393575+00:00", "p": 3650.0}, {"t": "2026-08-21T22:58:12.893059+00:00", "p": 3655.0}], "median": 3655.0, "min": 3650.0}, {"code": "SEL", "name": "Seul", "region": "asia", "threshold": 1000.0, "best": {"price": 2914.0, "currency": "PLN", "depart": "2026-10-21", "ret": "2026-11-07", "out": "GDN → ATH → ADD → ICN (W6)", "back": "ICN → GDN (W6, 2 przes.)", "stops": 2, "airlines": "W6,Kupi.com", "seen": "2026-08-21T22:58:13.615349+00:00"}, "top": [{"price": 2914.0, "depart": "2026-10-21", "ret": "2026-11-07", "out": "GDN → ATH → ADD → ICN (W6)", "stops": 2}, {"price": 2948.0, "depart": "2026-10-23", "ret": "2026-11-11", "out": "GDN → ATH → ADD → ICN (W6)", "stops": 2}, {"price": 2954.0, "depart": "2026-10-23", "ret": "2026-11-12", "out": "GDN → ATH → ADD → ICN (W6)", "stops": 2}, {"price": 3282.0, "depart": "2026-10-22", "ret": "2026-11-07", "out": "GDN → TIA → ATH → ADD → ICN (W6)", "stops": 3}, {"price": 3404.0, "depart": "2026-10-20", "ret": "2026-11-10", "out": "GDN → CPH → ICN (TF)", "stops": 1}], "history": [{"t": "2026-08-21T22:36:45.819895+00:00", "p": 3670.0}, {"t": "2026-08-21T22:36:46.158349+00:00", "p": 2914.0}, {"t": "2026-08-21T22:58:13.346401+00:00", "p": 3670.0}, {"t": "2026-08-21T22:58:13.615349+00:00", "p": 2914.0}], "median": 3670.0, "min": 2914.0}, {"code": "BKK", "name": "Bangkok", "region": "asia", "threshold": 1000.0, "best": {"price": 4420.0, "currency": "PLN", "depart": "2026-12-27", "ret": "2027-01-10", "out": "GDN → WAW → SHJ → BKK (LO)", "back": "BKK → SHJ → WAW → GDN (LO)", "stops": 2, "airlines": "LO,Kupi.com", "seen": "2026-08-21T22:58:15.032484+00:00"}, "top": [{"price": 4420.0, "depart": "2026-12-27", "ret": "2027-01-10", "out": "GDN → WAW → SHJ → BKK (LO)", "stops": 2}], "history": [{"t": "2026-08-21T22:36:46.760677+00:00", "p": 2878.0}, {"t": "2026-08-21T22:36:47.142611+00:00", "p": 2617.0}, {"t": "2026-08-21T22:36:47.408160+00:00", "p": 2545.0}, {"t": "2026-08-21T22:36:47.675686+00:00", "p": 4420.0}, {"t": "2026-08-21T22:58:14.037842+00:00", "p": 2878.0}, {"t": "2026-08-21T22:58:14.343177+00:00", "p": 2617.0}, {"t": "2026-08-21T22:58:14.651881+00:00", "p": 2545.0}, {"t": "2026-08-21T22:58:15.032484+00:00", "p": 4420.0}], "median": 2878.0, "min": 2545.0}, {"code": "SIN", "name": "Singapur", "region": "asia", "threshold": 1000.0, "best": null, "top": [], "history": [], "median": null, "min": null}, {"code": "HAN", "name": "Hanoi", "region": "asia", "threshold": 1000.0, "best": null, "top": [], "history": [], "median": null, "min": null}, {"code": "DPS", "name": "Bali (Denpasar)", "region": "asia", "threshold": 1000.0, "best": {"price": 3695.0, "currency": "PLN", "depart": "2026-09-14", "ret": "2026-09-28", "out": "GDN → DPS (FR, 3 przes.)", "back": "DPS → HKT → AUH → CPH → GDN (FR)", "stops": 3, "airlines": "FR,Kiwi.com", "seen": "2026-08-21T22:58:16.576230+00:00"}, "top": [{"price": 3695.0, "depart": "2026-09-14", "ret": "2026-09-28", "out": "GDN → DPS (FR, 3 przes.)", "stops": 3}], "history": [{"t": "2026-08-21T22:36:48.936341+00:00", "p": 3695.0}, {"t": "2026-08-21T22:58:16.576230+00:00", "p": 3695.0}], "median": 3695.0, "min": 3695.0}, {"code": "MNL", "name": "Manila", "region": "asia", "threshold": 1000.0, "best": {"price": 4778.0, "currency": "PLN", "depart": "2026-12-18", "ret": "2027-01-06", "out": "GDN → MXP → CKG → CAN → MNL (FR)", "back": "MNL → KUL → SHJ → WAW → GDN (FR)", "stops": 3, "airlines": "FR,Kiwi.com", "seen": "2026-08-21T22:58:17.445482+00:00"}, "top": [{"price": 4778.0, "depart": "2026-12-18", "ret": "2027-01-06", "out": "GDN → MXP → CKG → CAN → MNL (FR)", "stops": 3}], "history": [{"t": "2026-08-21T22:36:49.704921+00:00", "p": 4778.0}, {"t": "2026-08-21T22:58:17.445482+00:00", "p": 4778.0}], "median": 4778.0, "min": 4778.0}, {"code": "DEL", "name": "Delhi", "region": "asia", "threshold": 1000.0, "best": null, "top": [], "history": [], "median": null, "min": null}, {"code": "HKG", "name": "Hongkong", "region": "asia", "threshold": 1000.0, "best": null, "top": [], "history": [], "median": null, "min": null}, {"code": "TPE", "name": "Tajpej", "region": "asia", "threshold": 1000.0, "best": null, "top": [], "history": [], "median": null, "min": null}, {"code": "KUL", "name": "Kuala Lumpur", "region": "asia", "threshold": 1000.0, "best": null, "top": [], "history": [], "median": null, "min": null}, {"code": "SHA", "name": "Szanghaj", "region": "asia", "threshold": 1000.0, "best": null, "top": [], "history": [], "median": null, "min": null}], "alerts": [], "api_calls": 276, "history_days": 45}</script>
+<script>
+const D=JSON.parse(document.getElementById('data').textContent);
+const fmt=n=>n==null?'–':Math.round(n).toLocaleString('pl-PL')+' '+D.currency;
+const dt=s=>s?new Date(s).toLocaleString('pl-PL',{dateStyle:'medium',timeStyle:'short'}):'–';
+const dd=s=>s?new Date(s+'T00:00:00').toLocaleDateString('pl-PL',{day:'numeric',month:'short'}):'';
+const REG={americas:'Ameryki',asia:'Azja'};
+document.getElementById('sub').textContent='Bilety powrotne z '+D.origin+' · ostatnie skanowanie: '+dt(D.last_scan)+' · strona wygenerowana: '+dt(D.generated);
+
+// kafelki
+const withBest=D.routes.filter(r=>r.best);
+function cheapest(region){const rs=withBest.filter(r=>r.region===region).sort((a,b)=>a.best.price-b.best.price);return rs[0];}
+const week=D.alerts.filter(a=>Date.now()-new Date(a.sent_at)<7*864e5).length;
+const tiles=[['Najtaniej do Ameryk',cheapest('americas')],['Najtaniej do Azji',cheapest('asia')]].map(([l,r])=>r?
+ `<div class="tile"><div class="l">${l}</div><div class="v">${fmt(r.best.price)}</div><div class="d">${r.name} · ${dd(r.best.depart)} – ${dd(r.best.ret)}</div></div>`:
+ `<div class="tile"><div class="l">${l}</div><div class="v">–</div><div class="d">brak danych</div></div>`);
+tiles.push(`<div class="tile"><div class="l">Alerty w ostatnich 7 dniach</div><div class="v">${week}</div><div class="d">łącznie ${D.alerts.length} zapisanych</div></div>`);
+tiles.push(`<div class="tile"><div class="l">Poniżej progu teraz</div><div class="v">${withBest.filter(r=>r.best.price<r.threshold).length}</div><div class="d">z ${D.routes.length} kierunków</div></div>`);
+document.getElementById('tiles').innerHTML=tiles.join('');
+
+// sparkline: jedna seria (cena min. z każdego skanowania) – bez legendy
+function spark(r,i){
+ const h=r.history;if(h.length<2)return '<span class="dim">za mało danych</span>';
+ const W=140,H=36,p=h.map(x=>x.p),mn=Math.min(...p),mx=Math.max(...p),t0=new Date(h[0].t),t1=new Date(h[h.length-1].t);
+ const X=x=>((new Date(x.t)-t0)/((t1-t0)||1))*W,Y=x=>mx===mn?H/2:H-((x.p-mn)/(mx-mn))*(H-6)-3;
+ const d=h.map((x,j)=>(j?'L':'M')+X(x).toFixed(1)+' '+Y(x).toFixed(1)).join(' ');
+ const last=h[h.length-1];
+ const thr=r.threshold>=mn&&r.threshold<=mx?`<line x1="0" x2="${W}" y1="${Y({p:r.threshold})}" y2="${Y({p:r.threshold})}" stroke="var(--axis)" stroke-dasharray="3 3"/>`:'';
+ return `<svg class="spark" width="${W}" height="${H}" data-i="${i}" viewBox="0 0 ${W} ${H}" role="img" aria-label="trend ceny">${thr}
+ <path d="${d}" fill="none" stroke="var(--s1)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+ <circle cx="${X(last)}" cy="${Y(last)}" r="4" fill="var(--s1)" stroke="var(--surface)" stroke-width="2"/>
+ <rect width="${W}" height="${H}" fill="transparent"/></svg>`;
+}
+let region='all';
+function render(){
+ const tb=document.querySelector('#routes tbody');
+ const rows=D.routes.filter(r=>region==='all'||r.region===region).sort((a,b)=>(a.best?a.best.price:1e12)-(b.best?b.best.price:1e12));
+ tb.innerHTML=rows.map(r=>{const b=r.best,i=D.routes.indexOf(r),deal=b&&b.price<r.threshold;
+  return `<tr class="route${deal?' deal':''}" data-i="${i}"><td><b>${r.name}</b> <span class="dim">${r.code} · ${REG[r.region]||r.region}</span></td>
+  <td class="price">${b?fmt(b.price):'–'}${deal?'<span class="badge">okazja</span>':''}</td>
+  <td class="hide-m">${b?dd(b.depart)+' – '+dd(b.ret):''}</td>
+  <td class="hide-m path">${b?b.out+'<br>'+b.back:''}</td>
+  <td>${spark(r,i)}</td><td class="hide-m dim">${r.median?fmt(r.median):'–'}<br>próg ${fmt(r.threshold)}</td></tr>`;}).join('')||'<tr><td colspan="6" class="dim">Brak danych – poczekaj na pierwsze skanowanie.</td></tr>';
+}
+function tabs(){const t=document.getElementById('tabs');t.innerHTML=[['all','Wszystkie'],['americas','Ameryki'],['asia','Azja']].map(([k,l])=>`<button aria-pressed="${region===k}" data-r="${k}">${l}</button>`).join('');
+ t.querySelectorAll('button').forEach(b=>b.onclick=()=>{region=b.dataset.r;tabs();render();});}
+tabs();render();
+document.querySelector('#routes tbody').addEventListener('click',e=>{
+ const tr=e.target.closest('tr.route');if(!tr)return;const nx=tr.nextElementSibling;
+ if(nx&&nx.classList.contains('detail')){nx.remove();return;}
+ const r=D.routes[+tr.dataset.i];const d=document.createElement('tr');d.className='detail';
+ d.innerHTML=`<td colspan="6"><div class="detail"><b>5 najtańszych ofert (ostatnie skanowanie):</b><ul>${r.top.map(o=>`<li>${fmt(o.price)} · ${dd(o.depart)} – ${dd(o.ret)} · ${o.out}</li>`).join('')||'<li>brak</li>'}</ul>
+ <div class="dim">Najniższa cena w ${D.history_days} dni: ${fmt(r.min)} · mediana: ${fmt(r.median)} · <a target="_blank" rel="noopener" href="https://www.google.com/travel/flights?q=Flights%20from%20${D.origin}%20to%20${r.code}">szukaj w Google Flights</a></div></div></td>`;
+ tr.after(d);});
+// tooltip na sparkline
+const tip=document.getElementById('tip');
+document.addEventListener('mousemove',e=>{const s=e.target.closest&&e.target.closest('svg.spark');if(!s){tip.style.display='none';return;}
+ const r=D.routes[+s.dataset.i],h=r.history,box=s.getBoundingClientRect(),f=(e.clientX-box.left)/box.width;
+ const t0=new Date(h[0].t),t1=new Date(h[h.length-1].t),tt=t0.getTime()+f*(t1-t0);
+ let best=h[0];for(const x of h)if(Math.abs(new Date(x.t)-tt)<Math.abs(new Date(best.t)-tt))best=x;
+ tip.innerHTML=`<b>${fmt(best.p)}</b><br><span class="dim">${dt(best.t)}</span>`;tip.style.display='block';
+ tip.style.left=(e.clientX+12)+'px';tip.style.top=(e.clientY-40)+'px';});
+// alerty
+document.querySelector('#alerts tbody').innerHTML=D.alerts.map(a=>{const [route,dep,ret]=a.alert_key.split('|');
+ const why=a.reason.replace('fixed_threshold','poniżej progu').replace('history_drop','duży spadek').replace('+',' + ');
+ return `<tr><td class="dim">${dt(a.sent_at)}</td><td><b>${route}</b></td><td>${dd(dep)} – ${dd(ret)}</td><td class="price">${fmt(a.price)}</td><td class="hide-m dim">${why}</td></tr>`;}).join('')
+ ||'<tr><td colspan="5" class="dim">Jeszcze żadnych alertów.</td></tr>';
+</script>
+</body>
+</html>

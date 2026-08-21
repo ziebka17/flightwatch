@@ -12,6 +12,10 @@ concurrency:
   group: flightwatch
   cancel-in-progress: false
 
+defaults:
+  run:
+    working-directory: FlightWatch-GitHub
+
 jobs:
   scan:
     runs-on: ubuntu-latest

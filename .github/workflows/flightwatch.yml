@@ -42,11 +42,18 @@ jobs:
         run: |
           git config user.name "flightwatch-bot"
           git config user.email "flightwatch-bot@users.noreply.github.com"
+          # odłóż świeże wyniki na bok, pobierz najnowszą wersję repozytorium, przywróć wyniki
+          cp flightwatch.sqlite3 /tmp/flightwatch.sqlite3
+          cp -r ../docs /tmp/docs
+          git checkout -- . || true
+          git clean -fdq ../docs || true
+          git pull origin "${GITHUB_REF_NAME}"
+          cp /tmp/flightwatch.sqlite3 flightwatch.sqlite3
+          rm -rf ../docs && cp -r /tmp/docs ../docs
           git add flightwatch.sqlite3 ../docs
           if git diff --cached --quiet; then
             echo "brak zmian"
           else
             git commit -m "Aktualizacja cen i strony [skip ci]"
-            git pull --rebase origin "${GITHUB_REF_NAME}" || true
             git push
           fi

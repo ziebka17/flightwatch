@@ -35,15 +35,18 @@ jobs:
           FW_EMAIL_TO: ${{ secrets.FW_EMAIL_TO }}
         run: python -m flightwatch.main
 
-      - name: Zapisz historię cen
+      - name: Generowanie strony
+        run: python -m flightwatch.site --out ../docs/index.html
+
+      - name: Zapisz historię cen i stronę
         run: |
           git config user.name "flightwatch-bot"
           git config user.email "flightwatch-bot@users.noreply.github.com"
-          git add flightwatch.sqlite3
+          git add flightwatch.sqlite3 ../docs
           if git diff --cached --quiet; then
             echo "brak zmian"
           else
-            git commit -m "Aktualizacja historii cen [skip ci]"
+            git commit -m "Aktualizacja cen i strony [skip ci]"
             git pull --rebase origin "${GITHUB_REF_NAME}" || true
             git push
           fi

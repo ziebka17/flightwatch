@@ -1,0 +1,136 @@
+{
+  "_info": "Opis wszystkich ustawień jest w README.md. Ceny (fixed_threshold) w PLN za bilet powrotny.",
+  "origin": "GDN",
+  "currency": "PLN",
+  "adults": 1,
+  "search": {
+    "months_ahead": 6,
+    "min_days_ahead": 7,
+    "trip_length_min_days": 5,
+    "trip_length_max_days": 21,
+    "max_results_per_query": 100,
+    "max_alerts_per_destination": 3,
+    "market": "pl"
+  },
+  "api_budget": {
+    "monthly_max_calls": 20000
+  },
+  "regions": {
+    "americas": {
+      "fixed_threshold": 1200,
+      "destinations": [
+        {
+          "code": "NYC",
+          "name": "Nowy Jork"
+        },
+        {
+          "code": "LAX",
+          "name": "Los Angeles"
+        },
+        {
+          "code": "MIA",
+          "name": "Miami"
+        },
+        {
+          "code": "CHI",
+          "name": "Chicago"
+        },
+        {
+          "code": "YTO",
+          "name": "Toronto"
+        },
+        {
+          "code": "MEX",
+          "name": "Meksyk"
+        },
+        {
+          "code": "CUN",
+          "name": "Cancún"
+        },
+        {
+          "code": "SAO",
+          "name": "São Paulo"
+        },
+        {
+          "code": "BUE",
+          "name": "Buenos Aires"
+        },
+        {
+          "code": "LIM",
+          "name": "Lima"
+        },
+        {
+          "code": "BOG",
+          "name": "Bogota"
+        }
+      ]
+    },
+    "asia": {
+      "fixed_threshold": 1000,
+      "destinations": [
+        {
+          "code": "TYO",
+          "name": "Tokio"
+        },
+        {
+          "code": "SEL",
+          "name": "Seul"
+        },
+        {
+          "code": "BKK",
+          "name": "Bangkok"
+        },
+        {
+          "code": "SIN",
+          "name": "Singapur"
+        },
+        {
+          "code": "HAN",
+          "name": "Hanoi"
+        },
+        {
+          "code": "DPS",
+          "name": "Bali (Denpasar)"
+        },
+        {
+          "code": "MNL",
+          "name": "Manila"
+        },
+        {
+          "code": "DEL",
+          "name": "Delhi"
+        },
+        {
+          "code": "HKG",
+          "name": "Hongkong"
+        },
+        {
+          "code": "TPE",
+          "name": "Tajpej"
+        },
+        {
+          "code": "KUL",
+          "name": "Kuala Lumpur"
+        },
+        {
+          "code": "SHA",
+          "name": "Szanghaj"
+        }
+      ]
+    }
+  },
+  "history": {
+    "lookback_days": 45,
+    "min_samples": 8,
+    "drop_fraction": 0.45
+  },
+  "alerts": {
+    "cooldown_hours": 24,
+    "email": {
+      "enabled": true,
+      "smtp_host": "smtp.gmail.com",
+      "smtp_port": 587
+    }
+  },
+  "database": "flightwatch.sqlite3"
+}
